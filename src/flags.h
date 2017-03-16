@@ -30,6 +30,7 @@ struct flags {
     int dme : 1;
     int fuzzy : 1;
     int ils : 1;
+    int morse : 1;
     int ndb : 1;
     int quiet : 1;
     int spacing: 1;

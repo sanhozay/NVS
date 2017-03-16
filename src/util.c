@@ -21,9 +21,23 @@
 
 #include "util.h"
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+/**
+ * Safe append of a string to a buffer.
+ *
+ * @param buf the buffer
+ * @param s the string to append
+ * @param size the size of the buffer
+ * @return the new string on success, otherwise NULL
+ */
+char *append(char *buf, const char *s, size_t size)
+{
+    if (strlen(buf) + strlen(s) + 1 >= size)
+        return NULL;
+    return strcat(buf, s);
+}
 
 /**
  * Wrapper around POSIX strdup.

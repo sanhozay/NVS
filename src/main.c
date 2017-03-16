@@ -56,6 +56,7 @@ int main(int argc, char **argv)
         {"quiet", no_argument, NULL, 'q'},
         {"fuzzy", no_argument, NULL, 'f'},
         {"help", no_argument, NULL, 'h'},
+        {"morse", no_argument, NULL, 'm'},
         {"spacers", no_argument, NULL, 's'},
         {"dme", no_argument, NULL, 'd'},
         {"ils", no_argument, NULL, 'i'},
@@ -71,7 +72,7 @@ int main(int argc, char **argv)
 
     struct bounds *bounds = NULL;
     int c;
-    while ((c = getopt_long(argc, argv, "ab:cdfhinvqs", longopts, NULL)) != -1)
+    while ((c = getopt_long(argc, argv, "ab:cdfhimnvqs", longopts, NULL)) != -1)
         switch (c) {
         case 'a':
             set_all_restrictions(true);
@@ -103,6 +104,9 @@ int main(int argc, char **argv)
             break;
         case 'i':
             flags.ils |= 1;
+            break;
+        case 'm':
+            flags.morse |= 1;
             break;
         case 'n':
             flags.ndb |= 1;
@@ -259,6 +263,7 @@ void usage()
     puts("  -c, --coordinates      Show coordinates");
     puts("  -f, --fuzzy            Search names as well as codes");
     puts("  -h, --help             Show this help message");
+    puts("  -m, --morse            Show Morse code for each navaid");
     puts("  -q, --quiet            Don't display additional messages");
     puts("  -s, --spacers          Add spacer lines between results");
     puts("Search restrictions (multiples may be combined):");

@@ -1,5 +1,5 @@
 /*
- * NVS - Util Header
+ * NVS - Morse Header
  *
  * Copyright (c) 2017 Richard Senior
  *
@@ -17,30 +17,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef util_h
-#define util_h
-
-#include <stdio.h>
+#ifndef morse_h
+#define morse_h
 
 /**
- * Safe append of a string to a buffer.
+ * Generate a Morse code representation of a string.
  *
- * @param buf the target buffer
- * @param s the string to append
- * @param size the size of the target buffer
- * @return the new string on success, otherwise NULL
+ * @param s the string to represent as Morse code
+ * @param delim the delimiter between Morse characters
+ * @return individual characters of s converted to Morse
  */
-char *append(char *buf, const char *s, size_t size);
-
-/**
- * Wrapper around POSIX strdup.
- *
- * Exits with failure status when out of memory, never returns NULL. The
- * returned pointer must be freed after use.
- *
- * @param s the string to duplicate
- * @return a duplicate of the string
- */
-char *strdup_f(const char *s);
+char *morse(const char *s, const char *delim);
 
 #endif

@@ -27,6 +27,7 @@
 #include <string.h>
 
 #include "flags.h"
+#include "morse.h"
 #include "types.h"
 #include "util.h"
 
@@ -91,14 +92,16 @@ static char *format(const struct coordinate c)
  */
 static void print_common(const struct navaid *navaid)
 {
-    printf("%s %-4s %s %6.02f %3dnm %5dft %s\n",
+    extern struct flags flags;
+    printf("%s %-4s %s %6.02f %3dnm %5dft %s %s\n",
         description(navaid->type),
         navaid->code,
         format(navaid->coordinate),
         navaid->frequency,
         navaid->range,
         navaid->elevation,
-        navaid->name
+        navaid->name,
+        flags.morse ? morse(navaid->code, " ") : ""
     );
 }
 
@@ -109,7 +112,8 @@ static void print_common(const struct navaid *navaid)
  */
 static void print_loc(const struct navaid *navaid)
 {
-    printf("%s %-4s %s %6.02f %3dnm %5dft %s-%-3s %03.0f° %s\n",
+    extern struct flags flags;
+    printf("%s %-4s %s %6.02f %3dnm %5dft %s-%-3s %03.0f° %s %s\n",
         description(navaid->type),
         navaid->code,
         format(navaid->coordinate),
@@ -119,7 +123,8 @@ static void print_loc(const struct navaid *navaid)
         navaid->icao,
         navaid->runway,
         navaid->extra.bearing,
-        navaid->name
+        navaid->name,
+        flags.morse ? morse(navaid->code, " ") : ""
     );
 }
 
@@ -132,8 +137,9 @@ static void print_dme(const struct navaid *navaid)
 {
     if (navaid->icao == NULL || navaid->runway == NULL)
         print_common(navaid);
-    else
-        printf("%s %-4s %s %6.02f %3dnm %5dft %s-%-3s %s\n",
+    else {
+        extern struct flags flags;
+        printf("%s %-4s %s %6.02f %3dnm %5dft %s-%-3s %s %s\n",
             description(navaid->type),
             navaid->code,
             format(navaid->coordinate),
@@ -142,8 +148,10 @@ static void print_dme(const struct navaid *navaid)
             navaid->elevation,
             navaid->icao,
             navaid->runway,
-            navaid->name
+            navaid->name,
+            flags.morse ? morse(navaid->code, " ") : ""
         );
+    }
 }
 
 /**
