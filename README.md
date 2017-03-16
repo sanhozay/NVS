@@ -95,7 +95,10 @@ Create a build directory inside the project root and run cmake from it.
 
     $ mkdir build
     $ cd build
-    $ cmake -DCMAKE_INSTALL_PREFIX=$HOME -DCMAKE_BUILD_TYPE=Release ../src
+    $ cmake -DCMAKE_INSTALL_PREFIX=$HOME -DCMAKE_BUILD_TYPE=Release ..
+
+The default install directory, if no install prefix is supplied is
+`/usr/local/bin`.
     
 ### Building the project
 
