@@ -1,5 +1,7 @@
-/*
- * NVS - Parse Header
+/**
+ * @file parse.h
+ *
+ * Parse navaid structures from navigation data.
  *
  * Copyright (c) 2017 Richard Senior
  *
@@ -22,13 +24,6 @@
 
 struct bounds;
 
-/**
- * Parses a navaid from a 810 format string.
- *
- * @param s the 810 format navaid specification
- * @param bounds pointer to a bounds structure (may be NULL)
- * @return a pointer to a navaid structure or NULL if ignored
- */
 struct navaid *parse(const char *s, struct bounds *bounds);
 
 #endif

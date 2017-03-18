@@ -1,7 +1,7 @@
 /**
- * @file cache.h
+ * @file morse.h
  *
- * Manage an in-memory cache of navaids for searching.
+ * Translate characters and strings to Morse code.
  *
  * Copyright (c) 2017 Richard Senior
  *
@@ -19,12 +19,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef cache_h
-#define cache_h
+#ifndef morse_h
+#define morse_h
 
-struct bounds;
-
-struct navaid **create_cache(struct bounds *bounds);
-void destroy_cache(struct navaid **cache);
+char *morse(const char *s, const char *delim);
 
 #endif

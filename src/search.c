@@ -1,5 +1,7 @@
-/*
- * NVS - Search Implementation
+/**
+ * @file search.c
+ *
+ * Search the navigation data cache for navaids.
  *
  * Copyright (c) 2017 Richard Senior
  *
@@ -27,6 +29,7 @@
 #include <string.h>
 
 #include "flags.h"
+#include "morse.h"
 #include "types.h"
 #include "util.h"
 
@@ -36,12 +39,12 @@
 #define COORDINATE_MAX 32
 
 /**
- * Creates a description of a navaid type
+ * Returns a description of a navaid type
  *
  * @param type the navaid type
  * @return a string that describes the navaid type
  */
-static char *description(const enum NavaidType type)
+static char *type_description(const enum NavaidType type)
 {
     switch(type) {
     case NDB:
@@ -67,7 +70,7 @@ static char *description(const enum NavaidType type)
  * @param c the coordinate to format
  * @return a string representation of the coordinate
  */
-static char *format(const struct coordinate c)
+static char *format_coordinate(const struct coordinate c)
 {
     extern struct flags flags;
     static char s[COORDINATE_MAX] = "";
@@ -91,14 +94,16 @@ static char *format(const struct coordinate c)
  */
 static void print_common(const struct navaid *navaid)
 {
-    printf("%s %-4s %s %6.02f %3dnm %5dft %s\n",
-        description(navaid->type),
+    extern struct flags flags;
+    printf("%s %-4s %s %6.02f %3dnm %5dft %s %s\n",
+        type_description(navaid->type),
         navaid->code,
-        format(navaid->coordinate),
+        format_coordinate(navaid->coordinate),
         navaid->frequency,
         navaid->range,
         navaid->elevation,
-        navaid->name
+        navaid->name,
+        flags.morse ? morse(navaid->code, " ") : ""
     );
 }
 
@@ -109,17 +114,19 @@ static void print_common(const struct navaid *navaid)
  */
 static void print_loc(const struct navaid *navaid)
 {
-    printf("%s %-4s %s %6.02f %3dnm %5dft %s-%-3s %03.0f° %s\n",
-        description(navaid->type),
+    extern struct flags flags;
+    printf("%s %-4s %s %6.02f %3dnm %5dft %s-%-3s %03.0f° %s %s\n",
+        type_description(navaid->type),
         navaid->code,
-        format(navaid->coordinate),
+        format_coordinate(navaid->coordinate),
         navaid->frequency,
         navaid->range,
         navaid->elevation,
         navaid->icao,
         navaid->runway,
         navaid->extra.bearing,
-        navaid->name
+        navaid->name,
+        flags.morse ? morse(navaid->code, " ") : ""
     );
 }
 
@@ -132,18 +139,21 @@ static void print_dme(const struct navaid *navaid)
 {
     if (navaid->icao == NULL || navaid->runway == NULL)
         print_common(navaid);
-    else
-        printf("%s %-4s %s %6.02f %3dnm %5dft %s-%-3s %s\n",
-            description(navaid->type),
+    else {
+        extern struct flags flags;
+        printf("%s %-4s %s %6.02f %3dnm %5dft %s-%-3s %s %s\n",
+            type_description(navaid->type),
             navaid->code,
-            format(navaid->coordinate),
+            format_coordinate(navaid->coordinate),
             navaid->frequency,
             navaid->range,
             navaid->elevation,
             navaid->icao,
             navaid->runway,
-            navaid->name
+            navaid->name,
+            flags.morse ? morse(navaid->code, " ") : ""
         );
+    }
 }
 
 /**
@@ -151,7 +161,7 @@ static void print_dme(const struct navaid *navaid)
  *
  * @param navaid a pointer to a navaid structure
  */
-void print(const struct navaid *navaid)
+static void print(const struct navaid *navaid)
 {
     switch (navaid->type) {
     case NDB:

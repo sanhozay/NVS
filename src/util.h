@@ -1,5 +1,7 @@
-/*
- * NVS - Util Header
+/**
+ * @file util.h
+ *
+ * Utility functions.
  *
  * Copyright (c) 2017 Richard Senior
  *
@@ -20,15 +22,9 @@
 #ifndef util_h
 #define util_h
 
-/**
- * Wrapper around POSIX strdup.
- *
- * Exits with failure status when out of memory, never returns NULL. The
- * returned pointer must be freed after use.
- *
- * @param s the string to duplicate
- * @return a duplicate of the string
- */
+#include <stdio.h>
+
+char *append(char *buf, const char *s, size_t size);
 char *strdup_f(const char *s);
 
 #endif

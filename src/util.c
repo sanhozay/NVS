@@ -1,5 +1,7 @@
-/*
- * NVS - Util Implementation
+/**
+ * @file util.c
+ *
+ * Utility functions.
  *
  * Copyright (c) 2017 Richard Senior
  *
@@ -17,16 +19,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/// @cond Doxygen_Suppress
 #define _POSIX_C_SOURCE 200809L
+/// @endcond
 
 #include "util.h"
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 /**
- * Wrapper around POSIX strdup.
+ * Appends a string to a buffer with bounds checking.
+ *
+ * @param buf the buffer
+ * @param s the string to append
+ * @param size the size of the buffer
+ * @return the new string on success, otherwise NULL
+ */
+char *append(char *buf, const char *s, size_t size)
+{
+    if (strlen(buf) + strlen(s) + 1 >= size)
+        return NULL;
+    return strcat(buf, s);
+}
+
+/**
+ * Duplicates a string in dynamic storage.
  *
  * Exits with failure status when out of memory, never returns NULL. The
  * returned pointer must be freed after use.
@@ -36,6 +54,9 @@
  */
 char *strdup_f(const char *s)
 {
+    if (s == NULL)
+        return NULL;
+
     char *d;
     if ((d = strdup(s)) == NULL) {
         perror("strdup");

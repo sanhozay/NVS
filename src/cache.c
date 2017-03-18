@@ -1,5 +1,7 @@
-/*
- * NVS - Cache Implementation
+/**
+ * @file cache.c
+ *
+ * Manage an in-memory cache of navaids for searching.
  *
  * Copyright (c) 2017 Richard Senior
  *
@@ -19,6 +21,7 @@
 
 #include "cache.h"
 
+#include <assert.h>
 #include <ctype.h>
 #include <errno.h>
 #include <limits.h>
@@ -32,18 +35,21 @@
 #include "parse.h"
 #include "types.h"
 
+/**
+ * Size of chunks allocated dynamically as part of the navaid cache.
+ */
 #define CHUNKSIZE 8192
 
 /**
- * Navigation data file.
+ * Navigation data file handle.
  */
 static gzFile gz;
 
 /**
- * Exit handler.
+ * Closes resources on exit.
  *
- * Closes navigation data file. Must be registered with atexit before the
- * navigation data file is opened.
+ * The only closeable resource is the navigation data file. This function must
+ * be registered with atexit before the navigation data file is opened.
  */
 static void exit_handler()
 {
@@ -52,21 +58,26 @@ static void exit_handler()
 }
 
 /**
- * Dynamic cache structure
+ * Dynamic cache structure.
+ *
+ * The cache is a NULL-terminated contiguous array of pointers to navaid
+ * structures. Space is allocated in chunks and the max field keeps track
+ * of the largest index that can be used on the array.
  */
 struct dynamic_cache {
-    int chunks;
-    int max;
-    struct navaid **cache;
+    int chunks;             ///< Number of chunks allocated to the cache
+    int max;                ///< Maximum index available in the cache
+    struct navaid **cache;  ///< Dynamically allocated array of navaid pointers
 };
 
 /**
- * Initializes a dynamic cache.
+ * Initializes an empty dynamic cache.
  *
  * @param d a pointer to a dynamic cache structure
  */
 static void init(struct dynamic_cache *d)
 {
+    assert(d != NULL);
     d->chunks = 0;
     d->max = d->chunks * CHUNKSIZE - 1;
     d->cache = NULL;
@@ -75,10 +86,15 @@ static void init(struct dynamic_cache *d)
 /**
  * Creates a new chunk of memory in a dynamic cache.
  *
+ * The chunks field is incremented to track the number of chunks and the
+ * max field is updated to indicate the maximum index available in the
+ * array of pointers that form the cache.
+ *
  * @param d a pointer to a dynamic cache structure
  */
 static void create_chunk(struct dynamic_cache *d)
 {
+    assert(d != NULL);
     size_t size = ++d->chunks * CHUNKSIZE * sizeof(struct navaid *);
     d->max = d->chunks * CHUNKSIZE - 1;
     if ((d->cache = realloc(d->cache, size)) == NULL) {
@@ -88,12 +104,14 @@ static void create_chunk(struct dynamic_cache *d)
 }
 
 /**
- * Preprocess raw lines from the navigation data file.
+ * Preprocesses raw lines from the navigation data file.
  *
  * Newlines and carriage returns are stripped from the end of the string
- * and all characters are converted to uppercase.
+ * and all characters are converted to uppercase. Conversion to uppercase
+ * improves consistency in the output and produces a marginal performance
+ * improvement during searches.
  *
- * @param s a single line of the navigation data file
+ * @param s a line from the navigation data file
  * @return the length of the processed string
  */
 static int preprocess(char *s)
@@ -110,15 +128,16 @@ static int preprocess(char *s)
 }
 
 /**
- * Check the version of navigation data is supported.
+ * Checks if the navigation data is a supported version, based on its header.
  *
- * Exits with failure status if version cannot be determined or is not
- * supported.
+ * Prints a message to standard error and exits with failure status if version
+ * cannot be determined or is not supported.
  *
  * @param header the header line from the navigation data file
  */
 static void check_version(const char *header)
 {
+    assert(header != NULL && strlen(header) > 0);
     int version;
     if (sscanf(header, "%d", &version) == 0) {
         fprintf(stderr, "Malformed navigation data header:\n%s\n", header);
@@ -131,10 +150,24 @@ static void check_version(const char *header)
 }
 
 /**
- * Creates an array of pointers to navaid structures for searching.
+ * Creates a navaid cache.
  *
- * @param bounds pointer to a bounds structure (may be NULL)
- * @return an array of pointers to navaid structures
+ * The cache is built from the compressed navigation data file as a
+ * dynamically expanding contiguous array of pointers to navaid structures.
+ * Each line of the input file is converted to uppercase and trimmed, before
+ * being passed to a parser that creates navaid structures to add to the cache.
+ *
+ * The data file is located through the FG_ROOT environment variable.
+ *
+ * This function never returns NULL. Any errors in reading the input file or
+ * allocating memory for the cache result in a message printed to standard
+ * error and the program terminating with an error status.
+ *
+ * The pointer returned from this function must be freed after use (and the
+ * structures to which it points may also need to be freed).
+ *
+ * @param bounds a pointer to a bounds structure
+ * @return an array of pointers to navaid structures, terminated with NULL
  */
 struct navaid **create_cache(struct bounds *bounds)
 {
@@ -169,7 +202,7 @@ struct navaid **create_cache(struct bounds *bounds)
     char buf[BUFSIZ];
     struct navaid *navaid;
     int i = 0;
-    while(gzgets(gz, buf, BUFSIZ) != NULL) {
+    while (gzgets(gz, buf, BUFSIZ) != NULL) {
         if (preprocess(buf) == 0)
             continue;
         if (!have_spec) {
@@ -210,7 +243,7 @@ struct navaid **create_cache(struct bounds *bounds)
 }
 
 /**
- * Destroys a navaid structure.
+ * Destroys a single navaid structure.
  *
  * @param navaid a pointer to a navaid structure
  */
@@ -228,7 +261,7 @@ static void destroy_navaid(struct navaid *navaid)
 /**
  * Destroys a navaid cache.
  *
- * @param cache a navaids cache.
+ * @param cache an array of pointers to navaid structures
  */
 void destroy_cache(struct navaid **cache)
 {

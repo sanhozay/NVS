@@ -24,7 +24,7 @@ Search by name of navaid (fuzzy search)
 
     $ nvs -f sherburn
     Searching for ILS NDB VOR (including names)
-    NDB SBL   323.00  25nm     0ft Sherburn NDB
+    NDB SBL   323.00  25nm     0ft SHERBURN NDB
 
 Search for VORs and show coordinates:
 
@@ -33,6 +33,12 @@ Search for VORs and show coordinates:
     VOR MCT  (010.3136N, 123.9883E) 114.30  50nm    36ft MACTAN VOR-DME
     VOR MCT  (053.3569N, 002.2622W) 113.55 130nm   282ft MANCHESTER VOR-DME
     VOR MCT  (023.5911N, 058.2601E) 114.50 130nm    80ft SEEB VOR-DME
+
+Search for NDB and show Morse code ident:
+
+    $ nvs -nm sbl
+    Searching for NDB
+    NDB SBL   323.00  25nm     0ft SHERBURN NDB ... -... .-..
 
 Search for VORs with bounded coordinates, suppressing messages:
 
@@ -68,6 +74,8 @@ Search for all types of navaid (including DME) with spacers:
 
 ### Pre-requisites
 
+A working C compiler and build tools including `cmake` and `make`.
+
 The project has a dependency on `zlib`.
 
 GNU/Linux distributions should have a zlib development package, e.g.
@@ -87,7 +95,10 @@ Create a build directory inside the project root and run cmake from it.
 
     $ mkdir build
     $ cd build
-    $ cmake -DCMAKE_INSTALL_PREFIX=$HOME -DCMAKE_BUILD_TYPE=Release ../src
+    $ cmake -DCMAKE_INSTALL_PREFIX=$HOME -DCMAKE_BUILD_TYPE=Release ..
+
+The default install directory, if no install prefix is supplied is
+`/usr/local/bin`.
     
 ### Building the project
 
@@ -98,6 +109,12 @@ Build the executable in the build directory:
 Install to your install directory:
 
     $ make install
+
+If you have Doxygen installed, you can also build developer documentation
+
+    $ make doc
+
+Documentation is created in `build/doc`.
 
 ## Setup
 
@@ -116,6 +133,7 @@ You may want to define the variable in your `.profile`, `.bashrc`, etc.
       -c, --coordinates      Show coordinates
       -f, --fuzzy            Search names as well as codes
       -h, --help             Show this help message
+      -m, --morse            Show Morse code for each navaid
       -q, --quiet            Don't display additional messages
       -s, --spacers          Add spacer lines between results
     Search restrictions:
