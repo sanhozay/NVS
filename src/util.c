@@ -1,5 +1,7 @@
-/*
- * NVS - Util Implementation
+/**
+ * @file util.c
+ *
+ * Utility functions.
  *
  * Copyright (c) 2017 Richard Senior
  *
@@ -17,7 +19,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/// @cond Doxygen_Suppress
 #define _POSIX_C_SOURCE 200809L
+/// @endcond
 
 #include "util.h"
 
@@ -25,7 +29,7 @@
 #include <string.h>
 
 /**
- * Safe append of a string to a buffer.
+ * Appends a string to a buffer with bounds checking.
  *
  * @param buf the buffer
  * @param s the string to append
@@ -40,7 +44,7 @@ char *append(char *buf, const char *s, size_t size)
 }
 
 /**
- * Wrapper around POSIX strdup.
+ * Duplicates a string in dynamic storage.
  *
  * Exits with failure status when out of memory, never returns NULL. The
  * returned pointer must be freed after use.

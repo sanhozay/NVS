@@ -1,5 +1,7 @@
-/*
- * NVS - Main Program
+/**
+ * @file main.c
+ *
+ * Main program.
  *
  * Copyright (c) 2017 Richard Senior
  *
@@ -31,19 +33,169 @@
 #include "types.h"
 #include "util.h"
 
+/**
+ * Wildcard character for bounds specifications.
+ */
 #define BOUNDS_WILDCARD "*"
+
+/**
+ * Length of a spacer line.
+ */
 #define SPACER_LENGTH 1
+
+/**
+ * Character used for spacers.
+ */
 #define SPACER_CHAR '-'
 
-struct bounds *create_bounds();
-void parse_bounds(const char *s, struct bounds *bounds);
-bool show_bounds(const struct bounds *bounds);
-void spacer(int n);
-void usage();
-bool valid(const struct bounds *bounds);
+/**
+ * Creates and initializes a bounds structure, returning a pointer to it.
+ *
+ * The pointer must be freed after use.
+ *
+ * @return a pointer to an initialized bounds structure
+ */
+static struct bounds *create_bounds()
+{
+    struct bounds *bounds;
+    if ((bounds = malloc(sizeof(struct bounds))) == NULL) {
+        perror("malloc");
+        exit(EXIT_FAILURE);
+    }
+    bounds->max.lat = 90;
+    bounds->max.lon = 180;
+    bounds->min.lat = -bounds->max.lat;
+    bounds->min.lon = -bounds->max.lon;
+    return bounds;
+}
+
+/**
+ * Parses search bounds from a string.
+ *
+ * Elements of the search bounds can be omitted to use the defaults
+ * established in create_bounds. A complete bounds specification would
+ * have four elements, e.g. "60,2,50,-2". A partial bounds specification
+ * can have fewer elements, but they must be delimited, e.g. "60,,50,".
+ *
+ * Empty elements of a bounds specification can be difficult to read so
+ * a single wildcard character can be used for ease of entry.
+ *
+ * If the bounds cannot be parsed from the supplied string, the program
+ * is terminated with an exit status.
+ *
+ * @param s the bounds specification, e.g. 60,2,50,-4 or 60,*,50,*
+ * @param bounds a pointer to a bounds structure
+ */
+static void parse_bounds(const char *s, struct bounds *bounds)
+{
+    char *b = strdup_f(s);
+
+    double *lookup[4];
+    lookup[0] = &bounds->max.lat;
+    lookup[1] = &bounds->max.lon;
+    lookup[2] = &bounds->min.lat;
+    lookup[3] = &bounds->min.lon;
+
+    char *tok, *end;
+    int i = 0;
+    while ((tok = strtok(i == 0 ? b : NULL, ",")) != NULL) {
+        if (strlen(tok) > 0 && strncmp(tok, BOUNDS_WILDCARD, 1) != 0) {
+            double d;
+            if ((d = strtod(tok, &end)) == 0 && end == tok) {
+                fprintf(stderr, "Invalid token in bounds: %s\n", tok);
+                exit(EXIT_FAILURE);
+            } else {
+                *lookup[i] = d;
+            }
+        }
+        ++i;
+    }
+    free(b);
+}
+
+/**
+ * Prints the bounds in use to standard output.
+ *
+ * If no bounds are in use, prints nothing.
+ *
+ * @param bounds a pointer to a bounds structure
+ * @return true if anything was printed, otherwise false
+ */
+static bool show_bounds(const struct bounds *bounds)
+{
+    if (bounds == NULL)
+        return false;
+
+    printf("Using bounds top=%.02f, right=%.02f, bottom=%.02f, left=%.02f\n",
+        bounds->max.lat, bounds->max.lon,
+        bounds->min.lat, bounds->min.lon
+    );
+    return true;
+}
+
+/**
+ * Prints a spacer line to standard output.
+ *
+ * The spacer line consists of a single character repeated a configurable
+ * number of times, followed by a newline.
+ *
+ * @param n the number of spacer characters to print
+ */
+static void spacer(int n)
+{
+    while (n--)
+        putchar(SPACER_CHAR);
+    putchar('\n');
+}
+
+/**
+ * Prints a usage message to standard output.
+ */
+static void usage()
+{
+    printf("nvs v%s\n", PROJECT_VERSION);
+    puts("Usage: nvs [OPTIONS] ITEMS ...");
+    puts("  -a, --all              Search for all navaid types, including DME");
+    puts("  -b, --bounds=<bounds>  Bounded by [t],[r],[b],[l] (wildcard '*')");
+    puts("  -c, --coordinates      Show coordinates");
+    puts("  -f, --fuzzy            Search names as well as codes");
+    puts("  -h, --help             Show this help message");
+    puts("  -m, --morse            Show Morse code for each navaid");
+    puts("  -q, --quiet            Don't display additional messages");
+    puts("  -s, --spacers          Add spacer lines between results");
+    puts("Search restrictions (multiples may be combined):");
+    puts("  -d, --dme              Search for DMEs, including standalone");
+    puts("  -i, --ils              Search for ILS/LOC");
+    puts("  -n, --ndb              Search for NDBs");
+    puts("  -v, --vor              Search for VOR/VORTAC");
+}
+
+/**
+ * Checks if bounds are valid.
+ *
+ * The only checks performed are whether the maximum latitude and
+ * longitude are greater than the corresponding minimums and whether
+ * all are in range.
+ *
+ * @param bounds a pointer to a bounds structure
+ * @return true if the bounds are valid
+ */
+static bool valid(const struct bounds *bounds)
+{
+    return bounds->max.lat <= 90.0 &&
+        bounds->min.lat >= -90.0 &&
+        bounds->max.lon <= 180.0 &&
+        bounds->min.lon >= -180.0 &&
+        bounds->max.lat > bounds->min.lat &&
+        bounds->max.lon > bounds->min.lon;
+}
 
 /**
  * Main program.
+ *
+ * @param argc the number of program arguments
+ * @param argv the program arguments
+ * @return exit status
  */
 int main(int argc, char **argv)
 {
@@ -157,138 +309,4 @@ int main(int argc, char **argv)
     destroy_cache(cache);
 
     return EXIT_SUCCESS;
-}
-
-/**
- * Create a bounds structure and returns a pointer to it.
- *
- * The pointer must be freed after use.
- *
- * @return a pointer to an initialized bounds structure
- */
-struct bounds *create_bounds()
-{
-    struct bounds *bounds;
-    if ((bounds = malloc(sizeof(struct bounds))) == NULL) {
-        perror("malloc");
-        exit(EXIT_FAILURE);
-    }
-    bounds->max.lat = 90;
-    bounds->max.lon = 180;
-    bounds->min.lat = -bounds->max.lat;
-    bounds->min.lon = -bounds->max.lon;
-    return bounds;
-}
-
-/**
- * Parse search bounds from a string.
- *
- * Elements of the search bounds can be omitted to use the defaults
- * established in create_bounds. A complete bounds specification would
- * have four elements, e.g. "60,2,50,-2". A partial bounds specification
- * can have fewer elements, but they must be delimited, e.g. "60,,50,".
- *
- * @param s the bounds specification, e.g. 60,2,50,-4.
- * @param bounds a pointer to a bounds structure
- */
-void parse_bounds(const char *s, struct bounds *bounds)
-{
-    char *b = strdup_f(s);
-
-    double *lookup[4];
-    lookup[0] = &bounds->max.lat;
-    lookup[1] = &bounds->max.lon;
-    lookup[2] = &bounds->min.lat;
-    lookup[3] = &bounds->min.lon;
-
-    char *tok, *end;
-    int i = 0;
-    while ((tok = strtok(i == 0 ? b : NULL, ",")) != NULL) {
-        if (strlen(tok) > 0 && strncmp(tok, BOUNDS_WILDCARD, 1) != 0) {
-            double d;
-            if ((d = strtod(tok, &end)) == 0 && end == tok) {
-                fprintf(stderr, "Invalid token in bounds: %s\n", tok);
-                exit(EXIT_FAILURE);
-            } else {
-                *lookup[i] = d;
-            }
-        }
-        ++i;
-    }
-    free(b);
-}
-
-/**
- * Shows the bounds in use.
- *
- * @param bounds a pointer to a bounds structure
- * @return true if bounds are in use, otherwise false
- */
-bool show_bounds(const struct bounds *bounds)
-{
-    if (bounds == NULL)
-        return false;
-
-    printf("Using bounds top=%.02f, right=%.02f, bottom=%.02f, left=%.02f\n",
-        bounds->max.lat, bounds->max.lon,
-        bounds->min.lat, bounds->min.lon
-    );
-    return true;
-}
-
-/**
- * Prints a spacer line to standard output.
- *
- * The spacer line consists of a single character repeated a configurable
- * number of times, followed by a newline.
- *
- * @param n the number of spacer characters to print
- */
-void spacer(int n)
-{
-    while (n--)
-        putchar(SPACER_CHAR);
-    putchar('\n');
-}
-
-/**
- * Prints a usage message to standard output.
- */
-void usage()
-{
-    printf("nvs v%s\n", NVS_VERSION);
-    puts("Usage: nvs [OPTIONS] ITEMS ...");
-    puts("  -a, --all              Search for all navaid types, including DME");
-    puts("  -b, --bounds=<bounds>  Bounded by [t],[r],[b],[l] (wildcard '*')");
-    puts("  -c, --coordinates      Show coordinates");
-    puts("  -f, --fuzzy            Search names as well as codes");
-    puts("  -h, --help             Show this help message");
-    puts("  -m, --morse            Show Morse code for each navaid");
-    puts("  -q, --quiet            Don't display additional messages");
-    puts("  -s, --spacers          Add spacer lines between results");
-    puts("Search restrictions (multiples may be combined):");
-    puts("  -d, --dme              Search for DMEs, including standalone");
-    puts("  -i, --ils              Search for ILS/LOC");
-    puts("  -n, --ndb              Search for NDBs");
-    puts("  -v, --vor              Search for VOR/VORTAC");
-}
-
-/**
- * Checks if bounds are valid.
- *
- * The only checks performed are whether the maximum latitude and
- * longitude are greater than the corresponding minimums and whether
- * they are in range.
- *
- * @param bounds a pointer to a bounds structure
- * @return true if the bounds are valid
- */
-bool valid(const struct bounds *bounds)
-{
-    return bounds->max.lat <= 90.0 &&
-        bounds->min.lat >= -90.0 &&
-        bounds->max.lon <= 180.0 &&
-        bounds->min.lon >= -180.0 &&
-        bounds->max.lat > bounds->min.lat &&
-        bounds->max.lon > bounds->min.lon;
 }

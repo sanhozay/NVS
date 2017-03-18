@@ -1,5 +1,7 @@
-/*
- * NVS - Search Header
+/**
+ * @file search.h
+ *
+ * Search the navigation data cache for navaids.
  *
  * Copyright (c) 2017 Richard Senior
  *
@@ -22,13 +24,6 @@
 
 struct navaid;
 
-/**
- * Finds a navaid and prints information to standard output.
- *
- * @param cache the navaid cache
- * @param code the navaid code to search for
- * @return the number of matching navaids
- */
 int find(struct navaid **cache, const char *code);
 
 #endif

@@ -1,5 +1,7 @@
-/*
- * NVS - Cache Header
+/**
+ * @file cache.h
+ *
+ * Manage an in-memory cache of navaids for searching.
  *
  * Copyright (c) 2017 Richard Senior
  *
@@ -22,18 +24,7 @@
 
 struct bounds;
 
-/**
- * Creates an array of pointers to navaid structures for searching.
- *
- * @return an array of pointers to navaid structures
- */
 struct navaid **create_cache(struct bounds *bounds);
-
-/**
- * Destroys a navaid cache.
- *
- * @param cache an array of pointers to navaid structures
- */
 void destroy_cache(struct navaid **cache);
 
 #endif

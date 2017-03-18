@@ -1,5 +1,7 @@
-/*
- * NVS - Flags Implementation
+/**
+ * @file flags.c
+ *
+ * Manage program flags.
  *
  * Copyright (c) 2017 Richard Senior
  *
@@ -26,9 +28,10 @@
  */
 struct flags flags;
 
-/* Checks if all restrictions are set.
+/**
+ * Checks if all navaid restrictions are set, i.e.\ all types will be searched.
  *
- * @return true if all search restriction flags are set, i.e. search all
+ * @return true if all search restriction flags are set, otherwise false
  */
 bool all_restrictions()
 {
@@ -36,9 +39,9 @@ bool all_restrictions()
 }
 
 /**
- * Checks if any specific restriction is set.
+ * Checks if any specific navaid restriction is set.
  *
- * @return true if any search restriction flag is set.
+ * @return true if any search restriction flag is set, otherwise false
  */
 bool any_restriction()
 {
@@ -46,7 +49,7 @@ bool any_restriction()
 }
 
 /**
- * Sets all restriction flags to the same value.
+ * Sets all navaid restriction flags to the same value.
  *
  * @param state the value to set
  */
@@ -56,7 +59,10 @@ void set_all_restrictions(const bool state)
 }
 
 /**
- * Sets all restriction flags to their default state.
+ * Sets all navaid restriction flags to their default value.
+ *
+ * Default is to search for all types apart from DME. DMEs are usually
+ * co-located with another type.
  */
 void set_default_restrictions()
 {
@@ -65,9 +71,10 @@ void set_default_restrictions()
 }
 
 /**
- * Prints restriction flags to standard output, prefixed by a message.
+ * Prints navaid search flags to standard output, prefixed by a message.
  *
- * For example: show_flags("Searching for");
+ * Prints a message if the search is a fuzzy search or the search excludes
+ * at least one type of navaid (including DME).
  *
  * @param prefix the prefix for the flags message
  * @return true if a message was printed

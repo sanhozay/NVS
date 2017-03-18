@@ -1,5 +1,7 @@
-/*
- * NVS - Common Types Header
+/**
+ * @file types.h
+ *
+ * Global data type definitions.
  *
  * Copyright (c) 2017 Richard Senior
  *
@@ -20,63 +22,74 @@
 #ifndef types_h
 #define types_h
 
+/**
+ * Maximum length of a navaid code.
+ */
 #define CODE_MAX 8
+
+/**
+ * Maximum length of an ICAO airport code.
+ */
 #define ICAO_MAX 8
+
+/**
+ * Maximum length of a runway code.
+ */
 #define RWAY_MAX 8
 
 /**
  * Navaid types.
  */
 enum NavaidType {
-    NIL = 0,    /* Not valid or unassigned */
-    NDB = 2,    /* Non-Directional Beacon */
-    VOR = 3,    /* VOR and VORTAC */
-    ILS = 4,    /* ILS localizer */
-    LOC = 5,    /* Localizer */
-    GS  = 6,    /* Glideslope */
-    OM  = 7,    /* Outer Marker */
-    MM  = 8,    /* Middle Marker */
-    IM  = 9,    /* Inner Marker */
-    DME = 12,   /* DME component of VOR or ILS */
-    SDM = 13,   /* Standalone or NDB DME*/
-    EOD = 99    /* End of data marker */
+    NIL = 0,    ///< Not valid or unassigned
+    NDB = 2,    ///< Non-Directional Beacon
+    VOR = 3,    ///< VOR and VORTAC
+    ILS = 4,    ///< ILS localizer
+    LOC = 5,    ///< Localizer
+    GS  = 6,    ///< Glideslope
+    OM  = 7,    ///< Outer Marker
+    MM  = 8,    ///< Middle Marker
+    IM  = 9,    ///< Inner Marker
+    DME = 12,   ///< DME component of VOR or ILS
+    SDM = 13,   ///< Standalone or NDB DME
+    EOD = 99    ///< End of data marker
 };
 
 /**
- * Coordinate.
+ * Geospatial coordinate.
  */
 struct coordinate {
-    double lat;
-    double lon;
+    double lat; ///< Latitide
+    double lon; ///< Longitude
 };
 
 /**
  * Bounds.
  */
 struct bounds {
-    struct coordinate min;
-    struct coordinate max;
+    struct coordinate min; ///< Minimum bounds coordinate (bottom left)
+    struct coordinate max; ///< Maximum bounds coordinate (top right)
 };
 
 /**
  * Navaid structure.
  */
 struct navaid {
-    enum NavaidType type;
-    struct coordinate coordinate;
-    int elevation;
-    int range;
-    double frequency;
+    enum NavaidType type;           ///< Type of navaid (VOR, NDB, etc.)
+    struct coordinate coordinate;   ///< Coordinate
+    int elevation;                  ///< Elevation above sea level in feet
+    int range;                      ///< Reception range in nm
+    double frequency;               ///< Radio frequency
     union {
-        float unused;       /* NDB unused */
-        float variation;    /* VOR twist */
-        float bearing;      /* ILS bearing (true) */
-        float bias;         /* DME bias */
-    } extra;
-    char *code;
-    char *icao;
-    char *runway;
-    char *name;
+        float unused;               ///< NDB unused
+        float variation;            ///< VOR twist
+        float bearing;              ///< ILS bearing (true)
+        float bias;                 ///< DME bias
+    } extra;                        ///< Navaid specific field
+    char *code;                     ///< Identification code
+    char *icao;                     ///< Airport ICAO code (ILS/LOC/DME)
+    char *runway;                   ///< Runway code (ILS/LOC)
+    char *name;                     ///< Descriptive name
 };
 
 #endif

@@ -1,5 +1,7 @@
-/*
- * NVS - Search Implementation
+/**
+ * @file search.c
+ *
+ * Search the navigation data cache for navaids.
  *
  * Copyright (c) 2017 Richard Senior
  *
@@ -37,7 +39,7 @@
 #define COORDINATE_MAX 32
 
 /**
- * Creates a description of a navaid type
+ * Returns a description of a navaid type
  *
  * @param type the navaid type
  * @return a string that describes the navaid type
@@ -159,7 +161,7 @@ static void print_dme(const struct navaid *navaid)
  *
  * @param navaid a pointer to a navaid structure
  */
-void print(const struct navaid *navaid)
+static void print(const struct navaid *navaid)
 {
     switch (navaid->type) {
     case NDB:

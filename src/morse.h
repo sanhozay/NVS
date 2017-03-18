@@ -1,5 +1,7 @@
-/*
- * NVS - Morse Header
+/**
+ * @file morse.h
+ *
+ * Translate characters and strings to Morse code.
  *
  * Copyright (c) 2017 Richard Senior
  *
@@ -20,13 +22,6 @@
 #ifndef morse_h
 #define morse_h
 
-/**
- * Generate a Morse code representation of a string.
- *
- * @param s the string to represent as Morse code
- * @param delim the delimiter between Morse characters
- * @return individual characters of s converted to Morse
- */
 char *morse(const char *s, const char *delim);
 
 #endif

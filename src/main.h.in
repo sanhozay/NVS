@@ -1,5 +1,7 @@
-/*
- * NVS - Main Program
+/**
+ * @file main.h
+ *
+ * Main program.
  *
  * Copyright (c) 2017 Richard Senior
  *
@@ -20,6 +22,6 @@
 #ifndef main_h_in_h
 #define main_h_in_h
 
-#define NVS_VERSION "@NVS_VERSION@"
+#define PROJECT_VERSION "@PROJECT_VERSION@"
 
 #endif

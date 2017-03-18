@@ -110,6 +110,12 @@ Install to your install directory:
 
     $ make install
 
+If you have Doxygen installed, you can also build developer documentation
+
+    $ make doc
+
+Documentation is created in `build/doc`.
+
 ## Setup
 
 Define an environment variable FG_ROOT that provides the path to the 

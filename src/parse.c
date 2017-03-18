@@ -1,5 +1,7 @@
-/*
- * NVS - Parse
+/**
+ * @file parse.c
+ *
+ * Parse navaid structures from navigation data.
  *
  * Copyright (c) 2017 Richard Senior
  *
@@ -29,9 +31,11 @@
 #include "util.h"
 
 /**
- * Creates a navaid structure on the heap.
+ * Allocates a navaid structure.
  *
- * The structure must be freed after use.
+ * The pointer must be freed after use. If the memory cannot be allocated,
+ * prints a message to standard error and exits the program with a
+ * non-zero status.
  *
  * @return a pointer to a navaid structure (never returns NULL)
  */

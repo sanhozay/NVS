@@ -1,5 +1,7 @@
-/*
- * NVS - Util Header
+/**
+ * @file util.h
+ *
+ * Utility functions.
  *
  * Copyright (c) 2017 Richard Senior
  *
@@ -22,25 +24,7 @@
 
 #include <stdio.h>
 
-/**
- * Safe append of a string to a buffer.
- *
- * @param buf the target buffer
- * @param s the string to append
- * @param size the size of the target buffer
- * @return the new string on success, otherwise NULL
- */
 char *append(char *buf, const char *s, size_t size);
-
-/**
- * Wrapper around POSIX strdup.
- *
- * Exits with failure status when out of memory, never returns NULL. The
- * returned pointer must be freed after use.
- *
- * @param s the string to duplicate
- * @return a duplicate of the string
- */
 char *strdup_f(const char *s);
 
 #endif

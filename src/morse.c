@@ -1,5 +1,7 @@
-/*
- * NVS - Morse Implementation
+/**
+ * @file morse.c
+ *
+ * Translate characters and strings to Morse code.
  *
  * Copyright (c) 2017 Richard Senior
  *
@@ -25,55 +27,67 @@
 
 #include "util.h"
 
+/**
+ * Maximum length of a converted Morse string.
+ */
 #define MORSE_MAX 512
 
+/**
+ * Translation table from alpha characters to Morse strings.
+ */
 static char* morse_letters[26] = {
-    ".-",    /* A */
-    "-...",  /* B */
-    "-.-.",  /* C */
-    "-..",   /* D */
-    ".",     /* E */
-    "..-.",  /* F */
-    "--.",   /* G */
-    "....",  /* H */
-    "..",    /* I */
-    ".---",  /* J */
-    "-.-",   /* K */
-    ".-..",  /* L */
-    "--",    /* M */
-    "-.",    /* N */
-    "---",   /* O */
-    ".--.",  /* P */
-    "--.-",  /* Q */
-    ".-.",   /* R */
-    "...",   /* S */
-    "-",     /* T */
-    "..-",   /* U */
-    "...-",  /* V */
-    ".--",   /* W */
-    "-..-",  /* X */
-    "-.--",  /* Y */
-    "--.."  /* Z */
-};
-
-char *morse_numbers[10] = {
-    "-----", /* 0 */
-    ".----", /* 1 */
-    "..---", /* 2 */
-    "...--", /* 3 */
-    "....-", /* 4 */
-    ".....", /* 5 */
-    "-....", /* 6 */
-    "--...", /* 7 */
-    "---..", /* 8 */
-    "----."  /* 9 */
+    ".-",    ///< A
+    "-...",  ///< B
+    "-.-.",  ///< C
+    "-..",   ///< D
+    ".",     ///< E
+    "..-.",  ///< F
+    "--.",   ///< G
+    "....",  ///< H
+    "..",    ///< I
+    ".---",  ///< J
+    "-.-",   ///< K
+    ".-..",  ///< L
+    "--",    ///< M
+    "-.",    ///< N
+    "---",   ///< O
+    ".--.",  ///< P
+    "--.-",  ///< Q
+    ".-.",   ///< R
+    "...",   ///< S
+    "-",     ///< T
+    "..-",   ///< U
+    "...-",  ///< V
+    ".--",   ///< W
+    "-..-",  ///< X
+    "-.--",  ///< Y
+    "--.."   ///< Z
 };
 
 /**
- * Translate a character into a morse string.
+ * Translation table from digits to Morse strings.
+ */
+static char *morse_numbers[10] = {
+    "-----", ///< 0
+    ".----", ///< 1
+    "..---", ///< 2
+    "...--", ///< 3
+    "....-", ///< 4
+    ".....", ///< 5
+    "-....", ///< 6
+    "--...", ///< 7
+    "---..", ///< 8
+    "----."  ///< 9
+};
+
+/**
+ * Translates a single character into a morse string.
+ *
+ * Supports upper and lower case characters, and numbers. If a translation
+ * is not possible, NULL is returned.
  *
  * @param c the character to translate
- * @return the Morse translation
+ * @return the Morse translation as a string, or NULL if translation fails
  */
 static char *translate(const char c)
 {
@@ -84,14 +98,15 @@ static char *translate(const char c)
 }
 
 /**
- * Generate a Morse code representation of a string.
+ * Converts a string to its Morse code representation.
  *
  * The returned string is statically allocated and does not need to be
- * freed after use.
+ * freed after use. If a complete conversion is not possible, NULL is
+ * returned.
  *
- * @param s the string to represent as Morse code
- * @param delim the delimiter between Morse characters
- * @return individual characters of s converted to Morse
+ * @param s the string to translate
+ * @param delim the string used to delimit individual Morse characters
+ * @return the Morse code representation, or NULL if conversion fails
  */
 char *morse(const char *s, const char *delim)
 {
