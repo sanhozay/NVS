@@ -42,7 +42,7 @@
  * @param type the navaid type
  * @return a string that describes the navaid type
  */
-static char *description(const enum NavaidType type)
+static char *type_description(const enum NavaidType type)
 {
     switch(type) {
     case NDB:
@@ -68,7 +68,7 @@ static char *description(const enum NavaidType type)
  * @param c the coordinate to format
  * @return a string representation of the coordinate
  */
-static char *format(const struct coordinate c)
+static char *format_coordinate(const struct coordinate c)
 {
     extern struct flags flags;
     static char s[COORDINATE_MAX] = "";
@@ -94,9 +94,9 @@ static void print_common(const struct navaid *navaid)
 {
     extern struct flags flags;
     printf("%s %-4s %s %6.02f %3dnm %5dft %s %s\n",
-        description(navaid->type),
+        type_description(navaid->type),
         navaid->code,
-        format(navaid->coordinate),
+        format_coordinate(navaid->coordinate),
         navaid->frequency,
         navaid->range,
         navaid->elevation,
@@ -114,9 +114,9 @@ static void print_loc(const struct navaid *navaid)
 {
     extern struct flags flags;
     printf("%s %-4s %s %6.02f %3dnm %5dft %s-%-3s %03.0f° %s %s\n",
-        description(navaid->type),
+        type_description(navaid->type),
         navaid->code,
-        format(navaid->coordinate),
+        format_coordinate(navaid->coordinate),
         navaid->frequency,
         navaid->range,
         navaid->elevation,
@@ -140,9 +140,9 @@ static void print_dme(const struct navaid *navaid)
     else {
         extern struct flags flags;
         printf("%s %-4s %s %6.02f %3dnm %5dft %s-%-3s %s %s\n",
-            description(navaid->type),
+            type_description(navaid->type),
             navaid->code,
-            format(navaid->coordinate),
+            format_coordinate(navaid->coordinate),
             navaid->frequency,
             navaid->range,
             navaid->elevation,

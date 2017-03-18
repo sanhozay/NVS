@@ -77,7 +77,8 @@ bool show_flags(const char *prefix)
     if (all_restrictions() && !flags.fuzzy)
         return false;
 
-    printf("%s", prefix);
+    if (prefix != NULL)
+        printf("%s", prefix);
 
     if (flags.dme) printf(" DME");
     if (flags.ils) printf(" ILS");

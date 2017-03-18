@@ -19,6 +19,7 @@
 
 #include "cache.h"
 
+#include <assert.h>
 #include <ctype.h>
 #include <errno.h>
 #include <limits.h>
@@ -67,6 +68,7 @@ struct dynamic_cache {
  */
 static void init(struct dynamic_cache *d)
 {
+    assert(d != NULL);
     d->chunks = 0;
     d->max = d->chunks * CHUNKSIZE - 1;
     d->cache = NULL;
@@ -79,6 +81,7 @@ static void init(struct dynamic_cache *d)
  */
 static void create_chunk(struct dynamic_cache *d)
 {
+    assert(d != NULL);
     size_t size = ++d->chunks * CHUNKSIZE * sizeof(struct navaid *);
     d->max = d->chunks * CHUNKSIZE - 1;
     if ((d->cache = realloc(d->cache, size)) == NULL) {
@@ -119,6 +122,7 @@ static int preprocess(char *s)
  */
 static void check_version(const char *header)
 {
+    assert(header != NULL && strlen(header) > 0);
     int version;
     if (sscanf(header, "%d", &version) == 0) {
         fprintf(stderr, "Malformed navigation data header:\n%s\n", header);
@@ -169,7 +173,7 @@ struct navaid **create_cache(struct bounds *bounds)
     char buf[BUFSIZ];
     struct navaid *navaid;
     int i = 0;
-    while(gzgets(gz, buf, BUFSIZ) != NULL) {
+    while (gzgets(gz, buf, BUFSIZ) != NULL) {
         if (preprocess(buf) == 0)
             continue;
         if (!have_spec) {

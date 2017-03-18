@@ -50,6 +50,9 @@ char *append(char *buf, const char *s, size_t size)
  */
 char *strdup_f(const char *s)
 {
+    if (s == NULL)
+        return NULL;
+
     char *d;
     if ((d = strdup(s)) == NULL) {
         perror("strdup");
