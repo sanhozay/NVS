@@ -39,10 +39,10 @@ struct flags {
     int vor : 1;        ///< Search for VOR
 };
 
-bool all_restrictions();
-bool any_restriction();
+bool all_restrictions(void);
+bool any_restriction(void);
 void set_all_restrictions(const bool state);
-void set_default_restrictions();
+void set_default_restrictions(void);
 bool show_flags(const char *prefix);
 
 #endif

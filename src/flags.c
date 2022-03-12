@@ -33,7 +33,7 @@ struct flags flags;
  *
  * @return true if all search restriction flags are set, otherwise false
  */
-bool all_restrictions()
+bool all_restrictions(void)
 {
     return flags.dme && flags.ils && flags.ndb && flags.vor;
 }
@@ -43,7 +43,7 @@ bool all_restrictions()
  *
  * @return true if any search restriction flag is set, otherwise false
  */
-bool any_restriction()
+bool any_restriction(void)
 {
     return flags.dme || flags.ils || flags.ndb || flags.vor;
 }
@@ -64,7 +64,7 @@ void set_all_restrictions(const bool state)
  * Default is to search for all types apart from DME. DMEs are usually
  * co-located with another type.
  */
-void set_default_restrictions()
+void set_default_restrictions(void)
 {
     set_all_restrictions(true);
     flags.dme = false;
